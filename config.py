@@ -37,7 +37,7 @@ configPara.buffer_dir="train_result/buffer9/"
 
 configPara.train_image_path="train_Data/"
 #configPara.test_image_clean_path="test_data/clean/"
-configPara.test_image_path="test_data_txt/"
+configPara.test_image_path="test_data_txt/input/"
 
 if not os.path.exists(configPara.checkpoint_dir):
     os.makedirs(configPara.checkpoint_dir)

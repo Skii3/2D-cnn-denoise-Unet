@@ -16,7 +16,8 @@ def read_all_imgs(path,regx='*.txt'):
        # if re.search(regx, f):
         img_list.append(f)
 
-    img_list=sorted(img_list)
+    img_list=sorted(img_list,key= lambda x:int(x[:-4]))
+    #img_list = sorted(img_list)
     imgs = []
     #for idx in range(0, 5):
     for idx in range(0, len(img_list)):
@@ -114,6 +115,8 @@ def sampleImg(inputImg,nn):
     noiseImage=np.expand_dims(np.expand_dims(noiseImage,axis=0),axis=3)
     inputImage=np.expand_dims(np.expand_dims(inputImage,axis=0),axis=3)
 
+    #noiseImage = (noiseImage - np.mean(noiseImage)) / np.std(noiseImage)
+    #inputImage = (inputImage - np.mean(noiseImage)) / np.std(noiseImage)
     return noiseImage,inputImage
 
 def sampleImg2(inputImg,nn):

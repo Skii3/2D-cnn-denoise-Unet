@@ -25,25 +25,31 @@ configPara.gan_lambda=0.01
 configPara.test_freq=20
 configPara.save_model_freq=20
 
-configPara.scale= 5
-configPara.if_scale=True
+configPara.if_aug = False
+
+if configPara.if_aug:
+    configPara.scale = 5
+else:
+    configPara.scale = 0
+    
+configPara.if_scale = True
 
 nn1=configPara.nn1
 nn2=configPara.nn2
 scale=configPara.scale
 tvDiff_lambda=configPara.tvDiff_lambda
 configPara.type = 0
-TYPE = configPara.type         # 0 : 训练 ，  1: 测试   ， 2：测试sigsbee
+TYPE = configPara.type         # 0 : 训练 ，  1: 测试plut   ， 2：测试sigsbee   ， 3：测试sigsbee20
 
-configPara.samples_save_dir = "train_result/samples/"
+configPara.samples_save_dir = "train_result_without_aug/samples/"
 if TYPE == 0:
-    configPara.test_save_dir="train_result/test_result"           # 训练用
+    configPara.test_save_dir="train_result_without_aug/test_result"           # 训练用
 elif TYPE == 1:
-    configPara.test_save_dir="train_result/test_result_snr"       # 测试pluto用
+    configPara.test_save_dir="train_result_without_aug/test_result_snr"       # 测试pluto用
 else:
-    configPara.test_save_dir="train_result/test_result_sigsbee"       # 测试sigsbee
-configPara.checkpoint_dir = "train_result/checkpoint/"
-configPara.buffer_dir="train_result/buffer/"
+    configPara.test_save_dir="train_result_without_aug/test_result_sigsbee"       # 测试sigsbee
+configPara.checkpoint_dir = "train_result_without_aug/checkpoint/"
+configPara.buffer_dir="train_result_without_aug/buffer/"
 
 configPara.train_image_path="train_Data/"
 

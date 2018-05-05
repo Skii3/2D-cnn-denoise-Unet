@@ -21,7 +21,8 @@ def train():
     print("---------------------------reading image---------------------------")
     test_imgs = read_all_imgs(configPara.test_image_path, regx='.*.txt')
     target_imgs = read_all_imgs(configPara.test_image_path_target, regx='.*.txt')
-    # test_imgs = generate_noiseimgs(test_img,20)
+
+
     train_imgs = read_all_imgs(configPara.train_image_path, regx='.*.txt')
     train_imgs = expand_imgs(train_imgs)
 
@@ -37,12 +38,12 @@ def train():
     pixel_num = nn1 * nn1
     L1_loss_forward = tf.reduce_mean(tf.abs(forward1 - target1))
 
-    temp_snr = tf.cumsum(tf.square(tf.abs(target1))) /\
-               tf.cumsum(tf.square(tf.abs(target1-forward1)))
+    temp_snr = tf.reduce_sum(tf.square(tf.abs(target1))) /\
+               tf.reduce_sum(tf.square(tf.abs(target1-forward1)))
     snr_output = 10.0 * tf.log(temp_snr) / tf.log(10.0)
 
-    temp_snr2 = tf.cumsum(tf.square(tf.abs(target1))) / \
-               tf.cumsum(tf.square(tf.abs(target1 - input1)))
+    temp_snr2 = tf.reduce_sum(tf.square(tf.abs(target1))) / \
+               tf.reduce_sum(tf.square(tf.abs(target1 - input1)))
     snr_input = 10.0 * tf.log(temp_snr2) / tf.log(10.0)
 
     diff = forward1 - target1
@@ -130,7 +131,7 @@ def train():
             if np.size(imgs_input) == 1:
                 continue
             out = sess.run(forward1, {input1: imgs_input})
-            result = np.concatenate((imgs_input.squeeze(), out.squeeze()), axis=1)
+            result = np.concatenate((imgs_input.squeeze(), out.squeeze(),  imgs_target.squeeze()), axis=1)
 
             for i in range(9):
                 seq = random.randint(0, dataNum - 1)
@@ -139,7 +140,7 @@ def train():
                 if np.size(imgs_input) == 1:
                     continue
                 out = sess.run(forward1, {input1: imgs_input})
-                out = np.concatenate((imgs_input.squeeze(), out.squeeze()), axis=1)
+                out = np.concatenate((imgs_input.squeeze(), out.squeeze(), imgs_target.squeeze()), axis=1)
                 result = np.concatenate((result, out), axis=0)
 
             scipy.misc.imsave(configPara.samples_save_dir + '/train_forward%d.png' % epoch, result)
@@ -255,6 +256,7 @@ def runTest_test(test_imgs, target_imgs,sess):
         scipy.misc.imsave(configPara.test_save_dir + '/%d_noise.png' % round(input_snr), reScale(inputImage2.squeeze()))
 
 def test():
+    print(configPara)
     test_imgs = read_all_imgs(configPara.test_image_path, regx='.*.txt')
     target_imgs = read_all_imgs(configPara.test_image_path_target, regx='.*.txt')
     # test_imgs = generate_noiseimgs(test_img,20)
@@ -269,6 +271,7 @@ def test():
     runTest_test(test_imgs, target_imgs, sess)
 
 def test_20():
+    print(configPara)
     file_list = os.listdir(configPara.test_image_path_20)
     files = [f for f in file_list if f[0] != '.']
     tag = 0
@@ -323,7 +326,18 @@ def test_20():
         print('[*]input snr: %.2f, output snr: %.2f' % (input_snr/20, output_snr/20))
 
 
-train()
-#test()          #测试pluto测试集、sigsbee
-#test_20()      #测试20次sigsbee
+if configPara.type == 0:
+    train()
+    os.system('cp ./console_log.txt ./train_result_without_aug/train_log.txt')
+else:
+    if configPara.type == 1:
+        test()          #测试pluto测试集、sigsbee
+        os.system('cp ./console_log.txt ./train_result_without_aug/test_plut.txt')
+    if configPara.type == 2:
+        test()
+        os.system('cp ./console_log.txt ./train_result_without_aug/test_sigsbee.txt')
+    if configPara.type == 3:
+        test_20()      #测试20次sigsbee
+        os.system('cp ./console_log.txt ./train_result_without_aug/test_sigsbee20.txt')
+
 

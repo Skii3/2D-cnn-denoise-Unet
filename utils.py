@@ -15,9 +15,10 @@ def read_all_imgs(path,regx='*.txt'):
     for idx, f in enumerate(file_list):
        # if re.search(regx, f):
         img_list.append(f)
-
-    img_list=sorted(img_list,key= lambda x:int(x[:-4]))
-    #img_list = sorted(img_list)
+    if configPara.type != 0:
+        img_list=sorted(img_list,key= lambda x:int(x[:-4]))
+    else:
+        img_list = sorted(img_list)
     imgs = []
     #for idx in range(0, 5):
     for idx in range(0, len(img_list)):
@@ -127,40 +128,40 @@ def sampleImg2(inputImg,nn):
     h_loc=random.randint(0, h-h_size)
     w_loc=random.randint(0, w-w_size)
     inputImage=inputImg[w_loc:w_loc+w_size,h_loc:h_loc+h_size]
+    if configPara.if_aug == True:
+        aug_type=random.randint(0, 12)
+        if aug_type==1:
+            inputImage=np.fliplr(inputImage);
+        if aug_type==2:
+            inputImage=np.flipud(inputImage);
+        if aug_type==3:
+            inputImage=np.rot90(inputImage,1);
+        if aug_type==4:
+            inputImage=np.rot90(inputImage,2);
+        if aug_type==5:
+            inputImage=np.rot90(inputImage,3);
+        if aug_type==6:
+            inputImage=np.flipud(np.rot90(inputImage,1));
+        if aug_type==7:
+            inputImage=np.flipud(np.rot90(inputImage,2));
+        if aug_type==8:
+            inputImage=np.flipud(np.rot90(inputImage,3));
+        if aug_type==9:
+            inputImage=np.fliplr(np.rot90(inputImage,1));
+        if aug_type==10:
+            inputImage=np.fliplr(np.rot90(inputImage,2));
+        if aug_type==11:
+            inputImage=np.fliplr(np.rot90(inputImage,3));
 
-    aug_type=random.randint(0, 12)
-    if aug_type==1:
-        inputImage=np.fliplr(inputImage);
-    if aug_type==2:
-        inputImage=np.flipud(inputImage);
-    if aug_type==3:
-        inputImage=np.rot90(inputImage,1);
-    if aug_type==4:
-        inputImage=np.rot90(inputImage,2);
-    if aug_type==5:
-        inputImage=np.rot90(inputImage,3);
-    if aug_type==6:
-        inputImage=np.flipud(np.rot90(inputImage,1));
-    if aug_type==7:
-        inputImage=np.flipud(np.rot90(inputImage,2));
-    if aug_type==8:
-        inputImage=np.flipud(np.rot90(inputImage,3));
-    if aug_type==9:
-        inputImage=np.fliplr(np.rot90(inputImage,1));
-    if aug_type==10:
-        inputImage=np.fliplr(np.rot90(inputImage,2));
-    if aug_type==11:
-        inputImage=np.fliplr(np.rot90(inputImage,3));
+        #sigma = random.randint(1, 10)
 
-    #sigma = random.randint(1, 10)
-
-    intensity_aug=random.randint(1, 5)
-    if intensity_aug==2:
-        inputImage = inputImage * np.sqrt(np.sqrt(np.abs(inputImage)+1e-12))
-        inputImage = inputImage / np.max(inputImage)
-    if intensity_aug==3:
-        inputImage = inputImage / np.sqrt(np.sqrt(np.abs(inputImage)+1e-12))
-        inputImage = inputImage / np.max(inputImage)
+        intensity_aug=random.randint(1, 5)
+        if intensity_aug==2:
+            inputImage = inputImage * np.sqrt(np.sqrt(np.abs(inputImage)+1e-12))
+            inputImage = inputImage / np.max(inputImage)
+        if intensity_aug==3:
+            inputImage = inputImage / np.sqrt(np.sqrt(np.abs(inputImage)+1e-12))
+            inputImage = inputImage / np.max(inputImage)
 
 
     targetImage = np.zeros(inputImage.shape)

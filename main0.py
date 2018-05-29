@@ -324,20 +324,72 @@ def test_20():
             output_snr = output_snr + 10.0 * np.log(tmp_snr0) / np.log(10.0)  # 输出图片的snr
 
         print('[*]input snr: %.2f, output snr: %.2f' % (input_snr/20, output_snr/20))
+def test_plut_15():
+    print(configPara)
+    file_list = os.listdir(configPara.test_image_path)
+    tag = 0
+    for i in range(-5,16,1):
+        input_snr = 0
+        output_snr = 0
+
+        test_imgs = read_all_imgs(configPara.test_image_path+'%s/'%(i), regx='.*.txt')
+        target_imgs = read_all_imgs(configPara.test_image_path_target+'%s/'%(i), regx='.*.txt')
+        # test_imgs = generate_noiseimgs(test_img,20)
+
+
+        for j in range(0, 10, 1):
+            inputImage = test_imgs[j]
+            targetImage = target_imgs[j]
+            w, h = inputImage.shape
+
+            n = 8
+            h2 = h - h % n
+            w2 = w - w % n
+            if tag == 0:
+                input_image_forward_large = tf.placeholder('float32', [1, w2, h2, 1], name='input_test')
+                image_forward_large = generator(input_image_forward_large, reuse=False, net_name="net_forward")
+                sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
+                if configPara.test:
+                    checkpoint = tf.train.latest_checkpoint(configPara.checkpoint_dir)
+                    print checkpoint
+                    tf.train.Saver().restore(sess, checkpoint)
+                tag = 1
+
+            inputImage2 = inputImage[0:w2, 0:h2]
+            targetImage2 = targetImage[0:w2, 0:h2]
+            # test_img = test_img[0:w2,0:h2]
+            inputImage2 = np.expand_dims(np.expand_dims(inputImage2, axis=0), axis=3)
+            out = sess.run(image_forward_large, {input_image_forward_large: inputImage2})
+
+            # np.save(configPara.test_save_dir+'/my_%d.txt' % i,out.squeeze())
+
+            tmp_snr0 = np.sum(np.square(np.abs(targetImage2.squeeze()))) / np.sum(
+                np.square(np.abs(targetImage2.squeeze() - inputImage2.squeeze())))
+            input_snr = input_snr + 10.0 * np.log(tmp_snr0) / np.log(10.0)  # 输入图片的snr
+
+            tmp_snr0 = np.sum(np.square(np.abs(targetImage2.squeeze()))) / np.sum(
+                np.square(np.abs(targetImage2.squeeze() - out.squeeze())))
+            output_snr = output_snr + 10.0 * np.log(tmp_snr0) / np.log(10.0)  # 输出图片的snr
+
+        print('[*]input snr: %.2f, output snr: %.2f' % (input_snr/10, output_snr/10))
 
 
 if configPara.type == 0:
     train()
-    os.system('cp ./console_log.txt ./train_result_without_aug/train_log.txt')
+    os.system('cp ./console_log.txt ./train_result/train_log.txt')
 else:
     if configPara.type == 1:
         test()          #测试pluto测试集、sigsbee
-        os.system('cp ./console_log.txt ./train_result_without_aug/test_plut.txt')
+        os.system('cp ./console_log.txt ./train_result/test_plut.txt')
     if configPara.type == 2:
         test()
-        os.system('cp ./console_log.txt ./train_result_without_aug/test_sigsbee.txt')
-    if configPara.type == 3:
+        os.system('cp ./console_log.txt ./train_result/test_sigsbee.txt')
+    if configPara.type == 4:
         test_20()      #测试20次sigsbee
-        os.system('cp ./console_log.txt ./train_result_without_aug/test_sigsbee20.txt')
+        os.system('cp ./console_log.txt ./train_result/test_sigsbee20.txt')
+    if configPara.type == 3:
+        test_plut_15()  # 测试15次pluto
+        os.system('cp ./console_log.txt ./train_result/test_pluto10.txt')
+
 
 

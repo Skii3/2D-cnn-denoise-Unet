@@ -15,7 +15,9 @@ def read_all_imgs(path,regx='*.txt'):
     for idx, f in enumerate(file_list):
        # if re.search(regx, f):
         img_list.append(f)
-    if configPara.type != 0:
+    if configPara.type == 3:
+        img_list = sorted(img_list)
+    elif configPara.type != 0:
         img_list=sorted(img_list,key= lambda x:int(x[:-4]))
     else:
         img_list = sorted(img_list)
